@@ -65,7 +65,12 @@ let show_sheet () =
 (* on marque qu'on doit tout recalculer en remplissant le tableau de "None" *)
 (*    à faire : mettre tout le monde à None *)
 let invalidate_sheet () = 
-  print_string "invalidate_sheet : la fonction doit encore etre implementee\n"
+  let init_value i j =
+    thesheet.(i).(j).value <- None
+  in
+
+  sheet_iter init_value
+
 
 
 (*    à faire : le cœur du programme *)    
