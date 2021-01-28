@@ -97,7 +97,9 @@ and eval_op fo = match fo with
 (* ici un "and", car eval_formula et eval_cell sont a priori 
    deux fonctions mutuellement récursives *)
 and eval_cell i j =
+  thesheet.(i).(j).value <- Some(eval_form ((read_cell (i,j)).formula));
   eval_form ((read_cell (i,j)).formula)
+  
   
 
 (* on recalcule le tableau, en deux étapes *)
