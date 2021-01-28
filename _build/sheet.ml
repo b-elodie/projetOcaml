@@ -65,7 +65,12 @@ let show_sheet () =
 (* on marque qu'on doit tout recalculer en remplissant le tableau de "None" *)
 (*    à faire : mettre tout le monde à None *)
 let invalidate_sheet () = 
-  print_string "invalidate_sheet : la fonction doit encore etre implementee\n"
+  let init_value i j =
+    thesheet.(i).(j).value <- None
+  in
+
+  sheet_iter init_value
+
 
 
 (*    à faire : le cœur du programme *)    
@@ -75,12 +80,18 @@ let rec eval_form fo = match fo with
   | Op(o,fs) -> eval_op fo
 
 and eval_op fo = match fo with
-  | Op(S,[]) -> 0.
+  | Op(S,[]) -> failwith "somme vide"
+  | Op(S,[t]) -> eval_form t
   | Op(S,t::q) -> (eval_form t)+.(eval_op (Op(S,q)))
-  | Op(M,[]) -> 1.
+  | Op(M,[]) -> failwith "produit vide"
+  | Op(M,[t]) -> eval_form t
   | Op(M,t::q) -> (eval_form t)*.(eval_op (Op(M,q)))
-  | Op(A,[]) -> 0.
+  | Op(A,[]) -> failwith "moyenne vide"
+  | Op(A,[t]) -> eval_form t
   | Op(A,l) -> (eval_form (Op(S,l)))/.(float_of_int (List.length l))
+  | Op(MAX,[]) -> failwith "max vide"
+  | Op(MAX,[t]) -> eval_form t
+  | Op(MAX,t::q) -> max (eval_form t) (eval_op (Op(MAX,q)))
   | _ -> failwith "c'est mauvais !"
 
 (* ici un "and", car eval_formula et eval_cell sont a priori 

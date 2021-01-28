@@ -23,7 +23,7 @@ let coord_to_cellname co =
 
 
 (* operations que l'on peut utiliser dans les formules *)
-type oper = S | M | A (* sum, multiply, average *)
+type oper = S | M | A | MAX (* sum, multiply, average, max *)
 
 (* formules : une valeur, la même valeur qu'une autre cellule, une opération et
  * ses arguments *)
@@ -32,7 +32,7 @@ type form = Cst of number | Cell of (int*int) | Op of oper * form list
 (* cellules *)
 (* un type enregistrement
  * "mutable" signifie que l'on pourra modifier le champ
- * pour info, on a  type 'a option = None | Some of 'a (ici, 'a c'est number) 
+ * pour info, on a type 'a option = None | Some of 'a (ici, 'a c'est number) 
  * cell est un enregistrement avec deux champs, un champ formula de type form,
  * et un champ value contenant soit Some f (avec f un float), soit None *)
 type cell = { mutable formula : form; mutable value : number option }
@@ -53,6 +53,7 @@ let oper2string = function
   | S -> "SUM"
   | M -> "MULT"
   | A -> "AVERAGE"
+  | MAX -> "MAX"
 
 let ps = print_string
 

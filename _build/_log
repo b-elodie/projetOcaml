@@ -12,19 +12,19 @@
 # Target: debug.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:debug.cmo, file:debug.ml, implem, ocaml, quiet }
 /usr/bin/ocamlc.opt -c -o debug.cmo debug.ml # cached
 # Target: sheet.ml.depends, tags: { extension:ml, file:sheet.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep.opt -modules sheet.ml > sheet.ml.depends
+/usr/bin/ocamldep.opt -modules sheet.ml > sheet.ml.depends # cached
 # Target: sheet.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:sheet.cmo, file:sheet.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc.opt -c -o sheet.cmo sheet.ml
-# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
-/usr/bin/ocamllex.opt -q lexer.mll # cached
-# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep.opt -modules lexer.ml > lexer.ml.depends # cached
-# Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
-/usr/bin/ocamlyacc -v parser.mly # cached
-# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep.opt -modules parser.mli > parser.mli.depends # cached
+/usr/bin/ocamlc.opt -c -o sheet.cmo sheet.ml # cached
 # Target: command.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:command.cmo, file:command.ml, implem, ocaml, quiet }
-/usr/bin/ocamlc.opt -c -o command.cmo command.ml
+/usr/bin/ocamlc.opt -c -o command.cmo command.ml # cached
+# Target: lexer.mll, tags: { extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet }
+/usr/bin/ocamllex.opt -q lexer.mll
+# Target: lexer.ml.depends, tags: { extension:ml, file:lexer.ml, ocaml, ocamldep, quiet }
+/usr/bin/ocamldep.opt -modules lexer.ml > lexer.ml.depends
+# Target: parser.mly, tags: { extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet }
+/usr/bin/ocamlyacc -v parser.mly
+# Target: parser.mli.depends, tags: { extension:mli, file:parser.mli, ocaml, ocamldep, quiet }
+/usr/bin/ocamldep.opt -modules parser.mli > parser.mli.depends
 # Target: parser.cmi, tags: { byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet }
 /usr/bin/ocamlc.opt -c -o parser.cmi parser.mli
 # Target: lexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet }
@@ -36,11 +36,11 @@
 # Target: debug.cmx, tags: { compile, extension:cmx, extension:ml, file:debug.cmx, file:debug.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt.opt -c -o debug.cmx debug.ml # cached
 # Target: sheet.cmx, tags: { compile, extension:cmx, extension:ml, file:sheet.cmx, file:sheet.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt.opt -c -o sheet.cmx sheet.ml
-# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
-/usr/bin/ocamldep.opt -modules parser.ml > parser.ml.depends # cached
+/usr/bin/ocamlopt.opt -c -o sheet.cmx sheet.ml # cached
 # Target: command.cmx, tags: { compile, extension:cmx, extension:ml, file:command.cmx, file:command.ml, implem, native, ocaml, quiet }
-/usr/bin/ocamlopt.opt -c -o command.cmx command.ml
+/usr/bin/ocamlopt.opt -c -o command.cmx command.ml # cached
+# Target: parser.ml.depends, tags: { extension:ml, file:parser.ml, ocaml, ocamldep, quiet }
+/usr/bin/ocamldep.opt -modules parser.ml > parser.ml.depends
 # Target: parser.cmx, tags: { compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet }
 /usr/bin/ocamlopt.opt -c -o parser.cmx parser.ml
 # Target: lexer.cmx, tags: { compile, extension:cmx, extension:ml, file:lexer.cmx, file:lexer.ml, implem, native, ocaml, quiet }

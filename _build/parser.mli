@@ -10,6 +10,7 @@ type token =
   | SUM
   | MULT
   | AVERAGE
+  | MAX
   | SHOW
   | SHOWALL
   | EOF
