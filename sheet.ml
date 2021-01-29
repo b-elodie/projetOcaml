@@ -10,9 +10,6 @@ let thesheet = Array.make_matrix (fst size) (snd size) default_cell
 
 let read_cell co = thesheet.(fst co).(snd co)
 
-let update_cell_formula co f = thesheet.(fst co).(snd co).formula <- f
-let update_cell_value co v = thesheet.(fst co).(snd co).value <- v
-
 
 (* exécuter une fonction, f, sur tout le tableau *)
 let sheet_iter f =
@@ -60,16 +57,28 @@ let show_sheet () =
 
 
 
+
 (********** calculer les valeurs à partir des formules *************)
 
-(* on marque qu'on doit tout recalculer en remplissant le tableau de "None" *)
-(*    à faire : mettre tout le monde à None *)
+(* on marque qu'on doit tout recalculer en remplissant le tableau de "None" et puis on recalcule*)
 let invalidate_sheet () = 
   let init_value i j =
     thesheet.(i).(j).value <- None
   in
 
   sheet_iter init_value
+
+
+
+let update_cell_formula co f = 
+  thesheet.(fst co).(snd co).formula <- f;
+  invalidate_sheet ()
+
+
+let update_cell_value co v =
+  thesheet.(fst co).(snd co).value <- v;
+  invalidate_sheet ()
+
 
 
 
