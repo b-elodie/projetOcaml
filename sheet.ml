@@ -76,9 +76,7 @@ let update_cell_formula co f =
 
 
 let update_cell_value co v =
-  thesheet.(fst co).(snd co).value <- v;
-  invalidate_sheet ()
-
+  thesheet.(fst co).(snd co).value <- v
 
 
 
