@@ -72,7 +72,7 @@ let invalidate_sheet () =
 
 let update_cell_formula co f = 
   thesheet.(fst co).(snd co).formula <- f;
-  invalidate_sheet ()
+  recompute_sheet ()
 
 
 let update_cell_value co v =
