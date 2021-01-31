@@ -33,12 +33,15 @@ type form = Cst of number | Cell of (int*int) | Op of oper * form list
 (* un type enregistrement
  * "mutable" signifie que l'on pourra modifier le champ
  * pour info, on a type 'a option = None | Some of 'a (ici, 'a c'est number) 
- * cell est un enregistrement avec deux champs, un champ formula de type form,
- * et un champ value contenant soit Some f (avec f un float), soit None *)
-type cell = { mutable formula : form; mutable value : number option }
+ * cell est un enregistrement avec trois champs :
+ * - un champ formula de type form ;
+ * - un champ value contenant soit Some f (avec f un float), soit None ;
+ * - un champ repercussions qui stocke la liste des coordonnées des cellules dont les formules dépendent de notre cellule
+ * - un champ error qui informe si la cellule est buguée, par exemple par une erreur de dépendance causée par une boucle dans l'arbre des dépendances de la cellule *)
+type cell = { mutable formula : form; mutable value : number option; mutable repercussions : (int*int) list; mutable error : bool }
 
 (* cellule par défait : pas de valeur, et la formule correspondante est la constante 0. *)
-let default_cell = { formula = Cst 0.; value = None }
+let default_cell = { formula = Cst 0.; value = None; repercussions = []; error = false }
 
 
 
