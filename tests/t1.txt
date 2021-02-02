@@ -2,5 +2,6 @@ A2=4.3
 B1=A2
 Show A2
 Show B1
-
+A2=42
+Show A2
 
