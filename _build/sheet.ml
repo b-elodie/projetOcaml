@@ -189,6 +189,7 @@ let invalidate_sheet () =
 let rec invalidate_repercs_list repercs_list = match repercs_list with
   | [] -> ()
   | t::q when thesheet.(fst t).(snd t).value <> None -> thesheet.(fst t).(snd t).value <- None;
+                                                        thesheet.(fst t).(snd t).error <- false;
                                                           invalidate_repercs_list thesheet.(fst t).(snd t).repercussions;
                                                           invalidate_repercs_list q
   | t::q -> invalidate_repercs_list q
