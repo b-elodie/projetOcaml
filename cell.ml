@@ -49,9 +49,14 @@ let default_cell = { formula = Cst 0.; value = None; dependencies = []; repercus
 (************ affichage **************)
 let cell_name2string cn = (fst cn)^(string_of_int (snd cn))
 
-let cell_val2string c = match c.value with
-  | None -> "_"
-  | Some n -> string_of_float n
+let cell_val2string c =
+  if (c.error)
+  then
+    "Error"
+  else
+    match c.value with
+    | None -> "_"
+    | Some n -> string_of_float n
 
 let oper2string = function
   | S -> "SUM"
