@@ -13,6 +13,10 @@ type token =
   | MAX
   | SHOW
   | SHOWALL
+  | SHOWVAL
+  | SHOWALLVAL
+  | SHOWERROR
+  | SHOWALLERROR
   | EOF
 
 val debut :

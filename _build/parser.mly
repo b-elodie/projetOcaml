@@ -7,59 +7,61 @@ open Command
 %}
 /* énumération des lexèmes, ceux-ci sont décrits (par vous) dans lexer.mll */
 
-%token <int> INT       /* le lexème INT a un attribut entier */
+%token <int> INT         /* le lexème INT a un attribut entier */
 %token <float> NBR       /* le lexème NBR a un attribut flottant */
-%token <string> CELLROW       /* le lexème CELLROW a un attribut, de type string */
+%token <string> CELLROW  /* le lexème CELLROW a un attribut, de type string */
 %token LPAREN RPAREN EQUAL SEMICOL DOT
-%token SUM MULT AVERAGE MAX SHOW SHOWALL
+%token SUM MULT AVERAGE MAX
+%token SHOW SHOWALL SHOWVAL SHOWALLVAL SHOWERROR SHOWALLERROR
 %token EOF
 
-  /*
+/*
 %start singlecomm
 %type <Command.comm> singlecomm
-    */
+*/
       
 %start debut
 %type <Command.comm list> debut
 
 %%
 debut:
-   | clist EOF { $1 }
+  | clist EOF { $1 }
   ;
   
 clist:
-   | singlecomm clist { $1::$2 }
-   | singlecomm                { [$1] }
+  | singlecomm clist { $1::$2 }
+  | singlecomm { [$1] }
   ;
   
-  singlecomm:
-   | cell EQUAL formula { Upd($1,$3) }
-   | SHOW cell { Show($2) }
-   | SHOWALL { ShowAll }
+singlecomm:
+  | cell EQUAL formula { Upd($1,$3) }
+  | SHOW cell { Show($2) }
+  | SHOWALL { ShowAll }
+  | SHOWVAL cell { ShowVal($2) }
+  | SHOWALLVAL { ShowAllVal }
+  | SHOWERROR cell { ShowError($2) }
+  | SHOWALLERROR { ShowAllError }
   ;
 
-  cell:
-   | CELLROW INT { ($1,$2) }
+cell:
+  | CELLROW INT { ($1,$2) }
   ;
 
-  operand:
-   | SUM { S }
-   | MULT { M }
-   | AVERAGE { A }
-   | MAX { MAX }
+operand:
+  | SUM { S }
+  | MULT { M }
+  | AVERAGE { A }
+  | MAX { MAX }
   ;
   
-  formula:
-   | NBR { Cst $1 } 
-   | INT { Cst (float $1) } 
-   | cell { Cell (Cell.cellname_to_coord $1) }
-   | operand LPAREN forlist RPAREN { Op($1,$3) }
+formula:
+  | NBR { Cst $1 } 
+  | INT { Cst (float $1) } 
+  | cell { Cell (Cell.cellname_to_coord $1) }
+  | operand LPAREN forlist RPAREN { Op($1,$3) }
   ;
 
-  forlist:
-   | formula { [$1] }
-   | formula SEMICOL forlist { $1::$3 }
+forlist:
+  | formula { [$1] }
+  | formula SEMICOL forlist { $1::$3 }
   ;
-  
-
-       

@@ -37,10 +37,14 @@ let rec union_of_coos_lists_without_duplicates list1 list2 = match list1,list2 w
   | [],_ -> list2
   | t::q,_ -> union_of_coos_lists_without_duplicates q (insert_in_coos_list_without_duplicates t list2)
 
+let rec delete_in_list co list = match list with
+  | [] -> []
+  | t::q when t = co -> q (* la liste de repercussion est sans doublon par construction *)
+  | t::q -> t::(delete_in_list co q)
 
 let rec print_co_list co_list = match co_list with
   | [] -> print_string "$\n";
-  | t::q -> print_string ("(" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ " ");
+  | t::q -> print_string ("(" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ ") ");
             print_co_list q
 
 
@@ -71,7 +75,33 @@ let show_sheet () =
        (* aller à la ligne en fin de ligne *)
       if j = 0 then print_newline() else ();
       let c = read_cell (i,j) in
+      print_string (cell_content2string c);
+      print_string " "
+    end
+  in
+  sheet_iter g;
+  print_newline()
+
+let show_sheet_val () =
+  let g i j =
+    begin
+       (* aller à la ligne en fin de ligne *)
+      if j = 0 then print_newline() else ();
+      let c = read_cell (i,j) in
       print_string (cell_val2string c);
+      print_string " "
+    end
+  in
+  sheet_iter g;
+  print_newline()
+
+let show_sheet_error () =
+  let g i j =
+    begin
+       (* aller à la ligne en fin de ligne *)
+      if j = 0 then print_newline() else ();
+      let c = read_cell (i,j) in
+      print_string (cell_error2string c);
       print_string " "
     end
   in
@@ -80,43 +110,34 @@ let show_sheet () =
 
 
 
-
-
 (********** calculer les valeurs à partir des formules *************)
 
 (* On crée une fonction qui a pour rôle de faire propager une erreur de dépendance dans toutes une liste de cellule. Si une cellule C dépend d'une autre cellule C', et que cette cellule C' dépend encore d'une autre cellule C'', alors il faut aussi faire buguer C''. On ajoute donc la liste de repercussion de C' à la liste des cellules à faire buguer. On comprend donc le schéma : à chaque nouvelle cellule rencontrée, SI elle n'est pas encore buguée, on la fait buguée et on propage aussi à sa liste de repercussion *)
 let rec corrupt_cell_repercussions repercs_list = match repercs_list with
   | [] -> ()
-  | (i,j)::q -> if not (thesheet.(i).(j).error)
-                then
-                  begin
-                    thesheet.(i).(j).error <- true;
-                    corrupt_cell_repercussions q;
-                    corrupt_cell_repercussions (thesheet.(i).(j).repercussions);
-                  end
+  | (i,j)::q ->
+     if not (thesheet.(i).(j).error)
+     then
+       begin
+         thesheet.(i).(j).error <- true;
+         corrupt_cell_repercussions q;
+         corrupt_cell_repercussions (thesheet.(i).(j).repercussions);
+       end
 
 (* On crée une fonction qui prend une liste de repercussion complète, et qui se propage depuis une liste de dépendances dans toutes les dépendances pour regarder si on a pas une erreur de dépendance*)
 let rec test_repercussion_error full_repercs_list deps_list = match deps_list with
   | [] -> ()
   | t::q when ((List.mem t full_repercs_list) || (thesheet.(fst t).(snd t).error = true)) ->
     (* Si on se repercute soi-même, c'est qu'il y a une boucle dans les dépendances. Il peut aussi déjà y avoir une erreur de dépendance dans notre cellule, du fait qu'une cellule dont on dépend a elle même une erreur de dépendance. Dans tous les cas, on appelle une fonction auxilière qui va s'occuper de faire disjoncter les cellules qui nous ont été envoyées dans repercs_list (c'est-à-dire après plusieurs étapes y compris notre propre cellule), puisque ces même cellules dépendant de notre cellule qui est buguée. On garde quand même la liste de repercussion qui nous a été donnée pour que si plus tard la formule de la cellule est modifiée de manière à ce qu'il n'y ait plus de problème, alors on pourra accéder facilement aux cellules anciennement repercutées pour les actualiser *)
-     corrupt_cell_repercussions full_repercs_list
+    corrupt_cell_repercussions full_repercs_list
   | t::q -> test_repercussion_error (t::full_repercs_list) thesheet.(fst t).(snd t).dependencies;
             test_repercussion_error full_repercs_list q
 
 
 
-(* à faire : le cœur du programme *)    
-(*let rec eval_form_from_cell_call reperc_list fo i j = match fo with
-  | Cst(n) ->
-     begin
-       thesheet.(i).(j).repercussions <- union_of_reperc_lists_without_duplicates reperc_list (thesheet.(i).(j).repercussions);
-       n
-     end
-  | Cell(p,q) -> eval_cell reperc_list p q
-  | Op(o,fs) -> eval_op reperc_list fo*)
+(********** à faire : le cœur du programme **********)    
 
-(* fonction qui renvoie un couple : en premier la valeur de la formule donnée évaluée, et en deuxième la liste des cellules dont dépend cette formule avec un seul niveau de profondeur en dépendance *)
+(* fonction qui renvoie un couple avec en premier la valeur de la formule donnée évaluée, et en deuxième la liste des cellules dont dépend cette formule avec un seul niveau de profondeur en dépendance *)
 let rec eval_form repercs_list full_repercs_list fo = match fo with
   | Cst(n) -> (n, [])
   | Cell(p,q) -> (eval_cell repercs_list full_repercs_list p q, [(p,q)])
@@ -154,6 +175,7 @@ and eval_cell repercs_list full_repercs_list i j = (* repercs_list est la liste 
       (*print_string ("-> Evaluation de la cellule (" ^ (string_of_int i) ^ ";" ^ (string_of_int j) ^ ") en 0.\n");
       print_string "listes des répercussion qu'il faudra actualiser :\n";
       print_co_list thesheet.(i).(j).repercussions;*)
+      thesheet.(i).(j).value <- Some(0.);
       0. (* Je décide de renvoyer 0 comme je pourrais renvoyer n'importe quoi, puisque cette cellule et celles qui dépendent d'elle ont été mises sous erreur de dépendance. Si on voudrait faire les choses proprement, il faudrait même renvoyer un type d'erreur spécifique aux valeurs, qui ferait comme dans l'exam de ThProg "BOOM", mais serait trop lours à implémenter *)
     end
   else
@@ -188,29 +210,43 @@ let invalidate_sheet () =
 
 let rec invalidate_repercs_list repercs_list = match repercs_list with
   | [] -> ()
-  | t::q when thesheet.(fst t).(snd t).value <> None -> thesheet.(fst t).(snd t).value <- None;
-                                                        thesheet.(fst t).(snd t).error <- false;
-                                                          invalidate_repercs_list thesheet.(fst t).(snd t).repercussions;
-                                                          invalidate_repercs_list q
-  | t::q -> invalidate_repercs_list q
+  | t::q when thesheet.(fst t).(snd t).value <> None ->
+     (*print_string ("-> Invalidation de la cellule (" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ ")\n");*)
+     thesheet.(fst t).(snd t).value <- None;
+     thesheet.(fst t).(snd t).error <- false;
+     (*print_string "Liste de répercussion de t à invalider :\n";
+     print_co_list thesheet.(fst t).(snd t).repercussions;*)
+     invalidate_repercs_list thesheet.(fst t).(snd t).repercussions;
+     (*print_string ("Liste q de (" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ ") à invalider :\n");
+     print_co_list q;*)
+     invalidate_repercs_list q
+  | t::q ->
+     (*print_string ("-> Pas d'invalidation à faire pour (" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ ")\n");
+     print_string ("Liste q de (" ^ (string_of_int (fst t)) ^ ";" ^ (string_of_int (snd t)) ^ ") à invalider :\n");
+     print_co_list q;*)
+     invalidate_repercs_list q
+
+let rec eval_repercs_lists repercs_list = (*print_string "eval_repercs_lists call";*)
+  match repercs_list with
+  | [] -> ()
+  | t::q when thesheet.(fst t).(snd t).value = None ->
+     let _ = eval_cell [] [] (fst t) (snd t) in
+     eval_repercs_lists q;
+     eval_repercs_lists thesheet.(fst t).(snd t).repercussions
+  | t::q -> eval_repercs_lists q
 
             
 (* on recalcule le tableau, en deux étapes *)
 (*let recompute_sheet () =
   print_string "-> Recalculaaage de toute la table\n";
   invalidate_sheet ();
-  sheet_iter (eval_cell [] [])
- *)
-
-let rec delete_in_list co list = match list with
-  | [] -> []
-  | t::q when t = co -> q (* la liste de repercussion est sans doublon par construction *)
-  | t::q -> t::(delete_in_list co q)
+  sheet_iter (eval_cell [] [])*)
 
 let rec delete_from_deps_list co deps_list = match deps_list with
   | [] -> ()
-  | (i,j)::q -> thesheet.(i).(j).repercussions <- (delete_in_list co (thesheet.(i).(j).repercussions));
-                delete_from_deps_list co q
+  | (i,j)::q ->
+     thesheet.(i).(j).repercussions <- (delete_in_list co (thesheet.(i).(j).repercussions));
+     delete_from_deps_list co q
 
 
 let update_cell_formula co f =
@@ -229,11 +265,12 @@ let update_cell_formula co f =
   (*print_string "listes des répercussion à actualiser :\n";
   print_co_list thesheet.(fst co).(snd co).repercussions;*)
   invalidate_repercs_list thesheet.(fst co).(snd co).repercussions;
-  sheet_iter_over_coos_list (eval_cell [] []) thesheet.(fst co).(snd co).repercussions
+  print_string "Fin d'invalidation, et évaluation des repércussions\n";
+  print_co_list thesheet.(fst co).(snd co).repercussions;
+  (*sheet_iter_over_coos_list (eval_cell [] []) thesheet.(fst co).(snd co).repercussions c'est faux*)
+  eval_repercs_lists thesheet.(fst co).(snd co).repercussions
 
-(*
-let update_cell_value co v =
+(*let update_cell_value co v =
   print_string ("-> Mise à jour de la valeur de la cellule (" ^ (string_of_int (fst co)) ^ ";" ^ (string_of_int (snd co)) ^ ")\n");
-  thesheet.(fst co).(snd co).value <- v
- *)
+  thesheet.(fst co).(snd co).value <- v*)
 

@@ -8,23 +8,27 @@
    4  singlecomm : cell EQUAL formula
    5             | SHOW cell
    6             | SHOWALL
+   7             | SHOWVAL cell
+   8             | SHOWALLVAL
+   9             | SHOWERROR cell
+  10             | SHOWALLERROR
 
-   7  cell : CELLROW INT
+  11  cell : CELLROW INT
 
-   8  operand : SUM
-   9          | MULT
-  10          | AVERAGE
-  11          | MAX
+  12  operand : SUM
+  13          | MULT
+  14          | AVERAGE
+  15          | MAX
 
-  12  formula : NBR
-  13          | INT
-  14          | cell
-  15          | operand LPAREN forlist RPAREN
+  16  formula : NBR
+  17          | INT
+  18          | cell
+  19          | operand LPAREN forlist RPAREN
 
-  16  forlist : formula
-  17          | formula SEMICOL forlist
+  20  forlist : formula
+  21          | formula SEMICOL forlist
 
-  18  %entry% : '\001' debut
+  22  %entry% : '\001' debut
 
 state 0
 	$accept : . %entry% $end  (0)
@@ -36,17 +40,21 @@ state 0
 
 
 state 1
-	%entry% : '\001' . debut  (18)
+	%entry% : '\001' . debut  (22)
 
 	CELLROW  shift 3
 	SHOW  shift 4
 	SHOWALL  shift 5
+	SHOWVAL  shift 6
+	SHOWALLVAL  shift 7
+	SHOWERROR  shift 8
+	SHOWALLERROR  shift 9
 	.  error
 
-	debut  goto 6
-	clist  goto 7
-	singlecomm  goto 8
-	cell  goto 9
+	debut  goto 10
+	clist  goto 11
+	singlecomm  goto 12
+	cell  goto 13
 
 
 state 2
@@ -56,9 +64,9 @@ state 2
 
 
 state 3
-	cell : CELLROW . INT  (7)
+	cell : CELLROW . INT  (11)
 
-	INT  shift 10
+	INT  shift 14
 	.  error
 
 
@@ -68,7 +76,7 @@ state 4
 	CELLROW  shift 3
 	.  error
 
-	cell  goto 11
+	cell  goto 15
 
 
 state 5
@@ -78,197 +86,243 @@ state 5
 
 
 state 6
-	%entry% : '\001' debut .  (18)
+	singlecomm : SHOWVAL . cell  (7)
 
-	.  reduce 18
+	CELLROW  shift 3
+	.  error
+
+	cell  goto 16
 
 
 state 7
-	debut : clist . EOF  (1)
+	singlecomm : SHOWALLVAL .  (8)
 
-	EOF  shift 12
-	.  error
+	.  reduce 8
 
 
 state 8
+	singlecomm : SHOWERROR . cell  (9)
+
+	CELLROW  shift 3
+	.  error
+
+	cell  goto 17
+
+
+state 9
+	singlecomm : SHOWALLERROR .  (10)
+
+	.  reduce 10
+
+
+state 10
+	%entry% : '\001' debut .  (22)
+
+	.  reduce 22
+
+
+state 11
+	debut : clist . EOF  (1)
+
+	EOF  shift 18
+	.  error
+
+
+state 12
 	clist : singlecomm . clist  (2)
 	clist : singlecomm .  (3)
 
 	CELLROW  shift 3
 	SHOW  shift 4
 	SHOWALL  shift 5
+	SHOWVAL  shift 6
+	SHOWALLVAL  shift 7
+	SHOWERROR  shift 8
+	SHOWALLERROR  shift 9
 	EOF  reduce 3
 
-	clist  goto 13
-	singlecomm  goto 8
-	cell  goto 9
+	clist  goto 19
+	singlecomm  goto 12
+	cell  goto 13
 
 
-state 9
+state 13
 	singlecomm : cell . EQUAL formula  (4)
 
-	EQUAL  shift 14
+	EQUAL  shift 20
 	.  error
 
 
-state 10
-	cell : CELLROW INT .  (7)
+state 14
+	cell : CELLROW INT .  (11)
 
-	.  reduce 7
+	.  reduce 11
 
 
-state 11
+state 15
 	singlecomm : SHOW cell .  (5)
 
 	.  reduce 5
 
 
-state 12
+state 16
+	singlecomm : SHOWVAL cell .  (7)
+
+	.  reduce 7
+
+
+state 17
+	singlecomm : SHOWERROR cell .  (9)
+
+	.  reduce 9
+
+
+state 18
 	debut : clist EOF .  (1)
 
 	.  reduce 1
 
 
-state 13
+state 19
 	clist : singlecomm clist .  (2)
 
 	.  reduce 2
 
 
-state 14
+state 20
 	singlecomm : cell EQUAL . formula  (4)
 
-	INT  shift 15
-	NBR  shift 16
+	INT  shift 21
+	NBR  shift 22
 	CELLROW  shift 3
-	SUM  shift 17
-	MULT  shift 18
-	AVERAGE  shift 19
-	MAX  shift 20
+	SUM  shift 23
+	MULT  shift 24
+	AVERAGE  shift 25
+	MAX  shift 26
 	.  error
 
-	cell  goto 21
-	formula  goto 22
-	operand  goto 23
+	cell  goto 27
+	formula  goto 28
+	operand  goto 29
 
 
-state 15
-	formula : INT .  (13)
+state 21
+	formula : INT .  (17)
 
-	.  reduce 13
+	.  reduce 17
 
 
-state 16
-	formula : NBR .  (12)
+state 22
+	formula : NBR .  (16)
+
+	.  reduce 16
+
+
+state 23
+	operand : SUM .  (12)
 
 	.  reduce 12
 
 
-state 17
-	operand : SUM .  (8)
+state 24
+	operand : MULT .  (13)
 
-	.  reduce 8
-
-
-state 18
-	operand : MULT .  (9)
-
-	.  reduce 9
+	.  reduce 13
 
 
-state 19
-	operand : AVERAGE .  (10)
-
-	.  reduce 10
-
-
-state 20
-	operand : MAX .  (11)
-
-	.  reduce 11
-
-
-state 21
-	formula : cell .  (14)
+state 25
+	operand : AVERAGE .  (14)
 
 	.  reduce 14
 
 
-state 22
+state 26
+	operand : MAX .  (15)
+
+	.  reduce 15
+
+
+state 27
+	formula : cell .  (18)
+
+	.  reduce 18
+
+
+state 28
 	singlecomm : cell EQUAL formula .  (4)
 
 	.  reduce 4
 
 
-state 23
-	formula : operand . LPAREN forlist RPAREN  (15)
-
-	LPAREN  shift 24
-	.  error
-
-
-state 24
-	formula : operand LPAREN . forlist RPAREN  (15)
-
-	INT  shift 15
-	NBR  shift 16
-	CELLROW  shift 3
-	SUM  shift 17
-	MULT  shift 18
-	AVERAGE  shift 19
-	MAX  shift 20
-	.  error
-
-	cell  goto 21
-	formula  goto 25
-	operand  goto 23
-	forlist  goto 26
-
-
-state 25
-	forlist : formula .  (16)
-	forlist : formula . SEMICOL forlist  (17)
-
-	SEMICOL  shift 27
-	RPAREN  reduce 16
-
-
-state 26
-	formula : operand LPAREN forlist . RPAREN  (15)
-
-	RPAREN  shift 28
-	.  error
-
-
-state 27
-	forlist : formula SEMICOL . forlist  (17)
-
-	INT  shift 15
-	NBR  shift 16
-	CELLROW  shift 3
-	SUM  shift 17
-	MULT  shift 18
-	AVERAGE  shift 19
-	MAX  shift 20
-	.  error
-
-	cell  goto 21
-	formula  goto 25
-	operand  goto 23
-	forlist  goto 29
-
-
-state 28
-	formula : operand LPAREN forlist RPAREN .  (15)
-
-	.  reduce 15
-
-
 state 29
-	forlist : formula SEMICOL forlist .  (17)
+	formula : operand . LPAREN forlist RPAREN  (19)
 
-	.  reduce 17
+	LPAREN  shift 30
+	.  error
 
 
-18 terminals, 9 nonterminals
-19 grammar rules, 30 states
+state 30
+	formula : operand LPAREN . forlist RPAREN  (19)
+
+	INT  shift 21
+	NBR  shift 22
+	CELLROW  shift 3
+	SUM  shift 23
+	MULT  shift 24
+	AVERAGE  shift 25
+	MAX  shift 26
+	.  error
+
+	cell  goto 27
+	formula  goto 31
+	operand  goto 29
+	forlist  goto 32
+
+
+state 31
+	forlist : formula .  (20)
+	forlist : formula . SEMICOL forlist  (21)
+
+	SEMICOL  shift 33
+	RPAREN  reduce 20
+
+
+state 32
+	formula : operand LPAREN forlist . RPAREN  (19)
+
+	RPAREN  shift 34
+	.  error
+
+
+state 33
+	forlist : formula SEMICOL . forlist  (21)
+
+	INT  shift 21
+	NBR  shift 22
+	CELLROW  shift 3
+	SUM  shift 23
+	MULT  shift 24
+	AVERAGE  shift 25
+	MAX  shift 26
+	.  error
+
+	cell  goto 27
+	formula  goto 31
+	operand  goto 29
+	forlist  goto 35
+
+
+state 34
+	formula : operand LPAREN forlist RPAREN .  (19)
+
+	.  reduce 19
+
+
+state 35
+	forlist : formula SEMICOL forlist .  (21)
+
+	.  reduce 21
+
+
+22 terminals, 9 nonterminals
+23 grammar rules, 36 states

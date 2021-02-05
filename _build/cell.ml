@@ -2,8 +2,11 @@
 type number = float
 let print_number = print_float
 
+
+
 (* deux coordonnées, p.ex. ("B",7) *)
 type cellname = string*int
+
 
 
 (* les deux fonctions ci-dessous sont a reprendre, un jour ou l'autre :
@@ -46,10 +49,11 @@ let default_cell = { formula = Cst 0.; value = None; dependencies = []; repercus
 
 
 
-(************ affichage **************)
-let cell_name2string cn = (fst cn)^(string_of_int (snd cn))
+(********** affichage **********)
 
-let cell_val2string c =
+let cell_name2string cn = (fst cn) ^ (string_of_int (snd cn))
+
+let cell_content2string c =
   if (c.error)
   then
     "Error"
@@ -58,6 +62,17 @@ let cell_val2string c =
     | None -> "_"
     | Some n -> string_of_float n
 
+let cell_val2string c = match c.value with
+  | None -> "_"
+  | Some n -> string_of_float n
+
+let cell_error2string c =
+  if (c.error)
+  then
+    "Error"
+  else
+    "*"
+            
 let oper2string = function
   | S -> "SUM"
   | M -> "MULT"
@@ -79,7 +94,7 @@ let rec show_list f = function
   | x::xs ->
      begin
        f x;
-       ps";";
+       ps ";";
        show_list f xs
      end
   | _ -> failwith "show_list: the list shouldn't be empty"
