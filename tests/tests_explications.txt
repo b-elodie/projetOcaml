@@ -1,0 +1,10 @@
+Le test 1 montre que les commandes ajoutées ShowVal, ShowAllVal, ShowError et ShowAllError fonctionnent bien, et permet de voir ce qui les différencie.
+Le test 2 montre que la fonction MAX renvoie bien le résultat souhaité.
+Le test 3 montre qu'une cellule C qui dépend d'une cellule C' est bien mise à jour quand C' est modifiée.
+Le test 4 montre qu'une cellule C qui est à la racine de tout un arbre de dépendance met bien à jour toutes les cellules qu'elle est censée impacter lorsque sa formule est modifiée.
+Le test 5 montre qu'une cellule qui a une erreur de dépendance prend l'état de cellule erronnée.
+Le test 6 montre qu'une cellule qui a une erreur de dépendance ne fait pas "boucler" à l'infini le porgramme, mais qu'il continue bien d'exécuter les commandes suivantes.
+Le test 7 montre que la propagation de l'erreur de dépendance se passe bien.
+Le test 8 montre qu'une cellule avec une erreur de dépendance et qui a ensuite sa formule modifiée pour qu'il n'y ait plus d'erreur propage correctement l'actualisation des valeurs.
+Le test 9 montre l'efficacité de l'option PAF qui rattrape toute erreur de dépendance.
+Le test 10 montre qu'après un PAF, le programme se termine et aucune autre commande n'est exécutée.
