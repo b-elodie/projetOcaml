@@ -5,8 +5,8 @@ IFS=$'\n'
 
 
 
-liste_fichiers=`ls tests/ -I test_explications.txt`
-mapfile -t liste_noms < tests/test_explications.txt
+liste_fichiers=`ls tests/ -I tests_explications.txt`
+mapfile -t liste_noms < tests/tests_explications.txt
 
 
 let "index = 0"
