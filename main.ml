@@ -11,10 +11,7 @@ let lexbuf = Lexing.from_channel stdin
 
 let compile e =
   begin
-    print_newline();
     run_script e;
-    if !paf then print_int 42;
-    print_newline()
   end
 
 

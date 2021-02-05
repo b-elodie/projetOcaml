@@ -1,5 +1,6 @@
 (* tableau de cellules *)
 open Cell
+open Expr
 
 let size = (20,10) (* lignes, colonnes *)
 
@@ -169,15 +170,23 @@ and eval_cell repercs_list full_repercs_list i j = (* repercs_list est la liste 
   if ((List.mem (i,j) full_repercs_list) || (thesheet.(i).(j).error = true))
   then
     (* Si on se repercute soi-même, c'est qu'il y a une boucle dans les dépendances. Il peut aussi déjà y avoir une erreur de dépendance dans notre cellule, du fait qu'une cellule dont on dépend a elle même une erreur de dépendance. Dans tous les cas, on appelle une fonction auxilière qui va s'occuper de faire disjoncter les cellules qui nous ont été envoyées dans repercs_list (c'est-à-dire après plusieurs étapes y compris notre propre cellule), puisque ces même cellules dépendant de notre cellule qui est buguée. On garde quand même la liste de repercussion qui nous a été donnée pour que si plus tard la formule de la cellule est modifiée de manière à ce qu'il n'y ait plus de problème, alors on pourra accéder facilement aux cellules anciennement repercutées pour les actualiser *)
-    begin
-      thesheet.(i).(j).repercussions <- (union_of_coos_lists_without_duplicates (thesheet.(i).(j).repercussions) repercs_list);
-      corrupt_cell_repercussions repercs_list;
-      (*print_string ("-> Evaluation de la cellule (" ^ (string_of_int i) ^ ";" ^ (string_of_int j) ^ ") en 0.\n");
-      print_string "listes des répercussion qu'il faudra actualiser :\n";
-      print_co_list thesheet.(i).(j).repercussions;*)
-      thesheet.(i).(j).value <- Some(0.);
-      0. (* Je décide de renvoyer 0 comme je pourrais renvoyer n'importe quoi, puisque cette cellule et celles qui dépendent d'elle ont été mises sous erreur de dépendance. Si on voudrait faire les choses proprement, il faudrait même renvoyer un type d'erreur spécifique aux valeurs, qui ferait comme dans l'exam de ThProg "BOOM", mais serait trop lours à implémenter *)
-    end
+    if (!paf)
+    then
+      begin
+        (*print_newline();*)
+        print_string "PAF\n";
+        exit 0;
+      end
+    else
+      begin
+        thesheet.(i).(j).repercussions <- (union_of_coos_lists_without_duplicates (thesheet.(i).(j).repercussions) repercs_list);
+        corrupt_cell_repercussions repercs_list;
+        (*print_string ("-> Evaluation de la cellule (" ^ (string_of_int i) ^ ";" ^ (string_of_int j) ^ ") en 0.\n");
+        print_string "listes des répercussion qu'il faudra actualiser :\n";
+        print_co_list thesheet.(i).(j).repercussions;*)
+        thesheet.(i).(j).value <- Some(0.);
+        0. (* Je décide de renvoyer 0 comme je pourrais renvoyer n'importe quoi, puisque cette cellule et celles qui dépendent d'elle ont été mises sous erreur de dépendance. Si on voudrait faire les choses proprement, il faudrait même renvoyer un type d'erreur spécifique aux valeurs, qui ferait comme dans l'exam de ThProg "BOOM", mais serait trop lours à implémenter *)
+      end
   else
     match thesheet.(i).(j).value with
     | None ->
@@ -265,8 +274,8 @@ let update_cell_formula co f =
   (*print_string "listes des répercussion à actualiser :\n";
   print_co_list thesheet.(fst co).(snd co).repercussions;*)
   invalidate_repercs_list thesheet.(fst co).(snd co).repercussions;
-  print_string "Fin d'invalidation, et évaluation des repércussions\n";
-  print_co_list thesheet.(fst co).(snd co).repercussions;
+  (*print_string "Fin d'invalidation, et évaluation des repércussions\n";
+  print_co_list thesheet.(fst co).(snd co).repercussions;*)
   (*sheet_iter_over_coos_list (eval_cell [] []) thesheet.(fst co).(snd co).repercussions c'est faux*)
   eval_repercs_lists thesheet.(fst co).(snd co).repercussions
 
