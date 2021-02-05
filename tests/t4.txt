@@ -1,9 +1,0 @@
-A1=1
-A2=A1
-ShowAllVal
-A1=A1
-Show A1
-Show A2
-A1=1
-Show A1
-Show A2

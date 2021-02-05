@@ -1,4 +1,4 @@
-A1=0.
+A1=A1
 A2=1.
 A3=SUM(A1;A2)
 A4=SUM(A2;A3)
@@ -19,5 +19,5 @@ A18=SUM(A16;A17)
 A19=SUM(A17;A18)
 A20=SUM(A18;A19)
 ShowAll
-A1=1.
+A1=0.
 ShowAll
